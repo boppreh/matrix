@@ -132,6 +132,13 @@ class Matrix(object):
         for row, col in self.indices():
             yield self.m[row][col]
 
+    def __in__(self, item):
+        """ Searches for an item. """
+        for v in self:
+            if v == item:
+                return True
+        return False
+
     def _expand_slice(self, index):
         """
         Returns (start, stop) from the given slice, filling with expected
