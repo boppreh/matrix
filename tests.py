@@ -33,6 +33,16 @@ class Test(unittest.TestCase):
         self.assertEqual([[1, 2], [4, 5]], m[(0,0):(2,2)])
         self.assertEqual([[5, 6], [8, 9]], m[(1,1):(3,3)])
         self.assertEqual([[5, 6], [8, 9]], m[(1,1):])
+        self.assertEqual([[5, 6], [8, 9]], m[(-2,-2):])
+
+    def test_assignment(self):
+        m = Matrix()
+        m[0,0] = 0
+        self.assertEqual(0, m[0,0])
+        m[0] = [3, 2, 1]
+        self.assertEqual([3, 2, 1], m[0])
+        m[(0,0):(1,1)] = [[0]]
+        self.assertEqual([[0]], m[(0,0):(1,1)])
 
 if __name__ == '__main__':
     unittest.main()

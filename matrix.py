@@ -14,6 +14,17 @@ class Matrix(object):
             self.width = width
             self.m = [[None] * width for row in range(height)]
 
+    def _expand_slice(self, index):
+        start = list(index.start or (0, 0))
+        stop = list(index.stop or (self.height, self.width))
+
+        if start[0] < 0: start[0] += self.height
+        if start[1] < 0: start[1] += self.width
+        if stop[0] < 0: stop[0] += self.height
+        if stop[1] < 0: stop[1] += self.width
+
+        return slice(start, stop, index.step)
+
     def __getitem__(self, index):
         if isinstance(index, tuple):
             if len(index) == 2:
@@ -24,16 +35,15 @@ class Matrix(object):
         elif isinstance(index, int):
             return self.m[index]
         elif isinstance(index, slice):
-            start = index.start or (0, 0)
-            stop = index.stop or (self.height, self.width)
+            index = self._expand_slice(index)
 
-            height = stop[0] - start[0]
-            width = stop[1] - start[1]
+            height = index.stop[0] - index.start[0]
+            width = index.stop[1] - index.start[1]
 
             result = Matrix(height, width)
             for row in range(height):
                 for col in range(width):
-                    result[row,col] = self.m[start[0] + row][start[1] + col]
+                    result[row,col] = self.m[index.start[0] + row][index.start[1] + col]
             return result
         else:
             raise TypeError("Invalid index type " + str(index))
@@ -46,7 +56,20 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            self.m[index] = values
+            for i, v in enumerate(values):
+                self[index,i] = v
+        elif isinstance(index, slice):
+            start = index.start or (0, 0)
+            stop = index.stop or (self.height, self.width)
+
+            height = stop[0] - start[0]
+            width = stop[1] - start[1]
+
+            for row in range(height):
+                for col in range(width):
+                    self.m[start[0] + row][start[1] + col] = values[row][col]
+        else:
+            raise TypeError("Invalid index type " + str(index))
 
     def __repr__(self):
         return '\n' + '\n'.join(' '.join(map(str, line)) for line in self.m) + '\n'
