@@ -57,6 +57,11 @@ class Test(unittest.TestCase):
 
         self.assertEqual(list(range(1, 10)), list(m.list()))
 
+        m.addrow(1, [-1, -2, -3])
+        self.assertEqual([[1, 2, 3], [-1, -2, -3], [4, 5, 6], [7, 8, 9]], m)
+        m.addcol(1, [-1, -2, -3, -4])
+        self.assertEqual([[1, -1, 2, 3], [-1, -2, -2, -3], [4, -3, 5, 6], [7, -4, 8, 9]], m)
+
 
 if __name__ == '__main__':
     unittest.main()

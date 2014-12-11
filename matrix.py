@@ -21,6 +21,16 @@ class Matrix(object):
     def col(self, n):
         return [row[n] for row in self]
 
+    def addrow(self, i, values=None):
+        self.m.insert(i, values or [None] * self.width)
+        self.height += 1
+
+    def addcol(self, i, values=None):
+        values = values or [None] * self.height
+        for row, line in enumerate(self):
+            line.insert(i, values[row])
+        self.width += 1
+
     def list(self):
         for row in range(self.width):
             for col in range(self.height):
