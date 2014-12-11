@@ -69,15 +69,10 @@ class Matrix(object):
             for i, v in enumerate(values):
                 self[index,i] = v
         elif isinstance(index, slice):
-            start = index.start or (0, 0)
-            stop = index.stop or (self.height, self.width)
-
-            height = stop[0] - start[0]
-            width = stop[1] - start[1]
-
-            for row in range(height):
-                for col in range(width):
-                    self.m[start[0] + row][start[1] + col] = values[row][col]
+            index = self._expand_slice(index)
+            for row in range(index.stop[0] - index.start[0]):
+                for col in range(index.stop[1] - index.start[1]):
+                    self.m[index.start[0] + row][index.start[1] + col] = values[row][col]
         else:
             raise TypeError("Invalid index type " + str(index))
 
