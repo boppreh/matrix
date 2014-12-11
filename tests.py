@@ -21,8 +21,9 @@ class Test(unittest.TestCase):
         self.assertEqual(4, m[1,0])
         self.assertEqual(9, m[2,2])
 
-        self.assertEqual([1, 2, 3], m[0])
-        self.assertEqual([7, 8, 9], m[2])
+        self.assertEqual(1, m[0])
+        self.assertEqual(4, m[3])
+        self.assertEqual(9, m[-1])
 
     def test_slice(self):
         m = self.m()
@@ -58,7 +59,7 @@ class Test(unittest.TestCase):
         self.assertEqual([2, 5, 8], m.col(1))
         self.assertEqual([3, 6, 9], m.col(-1))
 
-        self.assertEqual(list(range(1, 10)), list(m.list()))
+        self.assertEqual(list(range(1, 10)), list(m))
         self.assertEqual((0, 0), next(m.indices()))
 
         m.addrow(1, [-1, -2, -3])
@@ -68,8 +69,8 @@ class Test(unittest.TestCase):
 
     def test_map(self):
         m = self.m()
-        self.assertEqual([1, 4, 9], m.map(lambda v: v**2)[0])
-        self.assertEqual([0, 1, 2], m.indexmap(lambda i, v: sum(i))[0])
+        self.assertEqual([1, 4, 9], m.map(lambda v: v**2).row(0))
+        self.assertEqual([0, 1, 2], m.indexmap(lambda i, v: sum(i)).row(0))
 
 
 if __name__ == '__main__':

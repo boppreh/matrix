@@ -8,7 +8,10 @@ class Matrix(object):
     few helper functions. All operations mutate the matrix in place, except
     `map` and `indexedmap`.
 
-    It behaves similarly to a list of lists, but with more features.
+    Usage:
+    m = Matrix(2, 3)
+    m[5] = 10
+    m[(0,0):(2,2)] = m[(1,1):(2,2)]
     """
     def __init__(self, height=None, width=None):
         """
@@ -24,8 +27,12 @@ class Matrix(object):
             self.m = []
         elif width is None:
             matrix = height
-            self.height = len(matrix)
-            self.width = len(matrix[0])
+            if isinstance(matrix, Matrix):
+                self.height = matrix.height
+                self.width = matrix.width
+            else:
+                self.height = len(matrix)
+                self.width = len(matrix[0])
             self.m = [[None] * self.width for row in range(self.height)]
             self[:] = matrix
         else:
@@ -35,7 +42,7 @@ class Matrix(object):
 
     def __bool__(self):
         """
-        A matrix is True if it has at least one element, regardless of value.
+        A matrix is True if it has at least one item, regardless of value.
         """
         return self.height and self.width
 
@@ -49,7 +56,7 @@ class Matrix(object):
         """
         Returns the n'th column.
         """
-        return [row[n] for row in self]
+        return [row[n] for row in self.m]
 
     def addrow(self, i, values=None):
         """
@@ -65,16 +72,9 @@ class Matrix(object):
         values to fill the new column (defaults to all None).
         """
         values = values or [None] * self.height
-        for row, line in enumerate(self):
+        for row, line in enumerate(self.m):
             line.insert(i, values[row])
         self.width += 1
-
-    def list(self):
-        """
-        Lists all items in matrix, from left to right and top to bottom.
-        """
-        for row, col in self.indices():
-            yield self.m[row][col]
 
     def indices(self):
         """
@@ -86,7 +86,7 @@ class Matrix(object):
 
     def map(self, fn):
         """
-        Applies `fn` to each element and stores the returned values in a new
+        Applies `fn` to each item and stores the returned values in a new
         matrix.
     
         fn("first") -> "new_first"
@@ -98,7 +98,7 @@ class Matrix(object):
 
     def indexmap(self, fn):
         """
-        Applies `fn` to each index and the corresponding element, and stores
+        Applies `fn` to each index and the corresponding item, and stores
         the returned values in a new matrix.
 
         fn((0, 0), "first") -> "new_first"
@@ -110,13 +110,16 @@ class Matrix(object):
         return result
 
     def __len__(self):
-        """ Length is the number of rows, like a list of lists.  """
-        return self.height
+        """
+        Length  returns total number of elements, regardless of rows and
+        columns.
+        """
+        return self.height * self.width
 
     def __iter__(self):
-        """ Iterate through every row, in accordance to len(matrix).  """
-        for row in range(self.height):
-            yield self[row]
+        """ Iterate through every item, in accordance to len(matrix). """
+        for row, col in self.indices():
+            yield self.m[row][col]
 
     def _expand_slice(self, index):
         """
@@ -136,8 +139,8 @@ class Matrix(object):
     def __getitem__(self, index):
         """
         Reads values from the matrix. Index can be a int (returning the i'th
-        row), a (row, col) tuple or a slice object of the those. Thus it may
-        return a single value, a list of a new matrix.
+        item), a (row, col) tuple or a slice object of the those. Thus it may
+        return a single value or a new matrix.
         """
         if isinstance(index, tuple):
             if len(index) == 2:
@@ -146,7 +149,9 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            return self.m[index]
+            row = index // self.width
+            col = index % self.width
+            return self.m[row][col]
         elif isinstance(index, slice):
             (row0, col0), (row1, col1) = self._expand_slice(index)
 
@@ -164,9 +169,8 @@ class Matrix(object):
     def __setitem__(self, index, values):
         """
         Writes values to the the matrix. Index can be a int (returning the i'th
-        row), a (row, col) tuple or a slice object of the those. `values` must
-        be a single value, a list or a matrix depending on the type of index
-        used.
+        item), a (row, col) tuple or a slice object of the those. `values` must
+        be a single value or a matrix depending on the type of index used.
         """
         if isinstance(index, tuple):
             if len(index) == 2:
@@ -175,10 +179,13 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            for i, v in enumerate(values):
-                self[index,i] = v
+            row = index // self.width
+            col = index % self.width
+            self.m[row][col] = values
         elif isinstance(index, slice):
             (row0, col0), (row1, col1) = self._expand_slice(index)
+            if isinstance(values, Matrix):
+                values = values.m
             for row in range(row1 - row0):
                 for col in range(col1 - col0):
                     self.m[row0 + row][col0 + col] = values[row][col]
