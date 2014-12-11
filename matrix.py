@@ -79,18 +79,20 @@ class Matrix(object):
     def removerow(self, i):
         """ Removes the i'th row. """
         self.m.pop(i)
+        self.height -= 1
 
     def removecol(self, i):
         """ Removes the i'th column. """
         for row in self.m:
             row.pop(i)
+        self.width -= 1
 
     def indices(self):
         """
         Lists all indices (indexes), e.g. (0, 0), (0, 1), (0, 2), (1, 0)...
         """
-        for row in range(self.width):
-            for col in range(self.height):
+        for row in range(self.height):
+            for col in range(self.width):
                 yield (row, col)
 
     def map(self, fn):
@@ -100,7 +102,7 @@ class Matrix(object):
     
         fn("first") -> "new_first"
         """
-        result = Matrix(self)
+        result = Matrix(self.height, self.width)
         for row, col in self.indices():
             result[row, col] = fn(self[row, col])
         return result
