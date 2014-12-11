@@ -8,7 +8,8 @@ class Matrix(object):
             matrix = height
             self.height = len(matrix)
             self.width = len(matrix[0])
-            self.m = matrix
+            self.m = [[None] * self.width for row in range(self.height)]
+            self[:] = matrix
         else:
             self.height = height
             self.width = width
