@@ -29,7 +29,7 @@ class Matrix(object):
         if stop[0] < 0: stop[0] += self.height
         if stop[1] < 0: stop[1] += self.width
 
-        return slice(start, stop, index.step)
+        return (start[0], start[1]), (stop[0], stop[1])
 
     def __iter__(self):
         for row in range(self.height):
@@ -45,15 +45,15 @@ class Matrix(object):
         elif isinstance(index, int):
             return self.m[index]
         elif isinstance(index, slice):
-            index = self._expand_slice(index)
+            (row0, col0), (row1, col1) = self._expand_slice(index)
 
-            height = index.stop[0] - index.start[0]
-            width = index.stop[1] - index.start[1]
+            height = row1 - row0
+            width = col1 - col0
 
             result = Matrix(height, width)
             for row in range(height):
                 for col in range(width):
-                    result[row,col] = self.m[index.start[0] + row][index.start[1] + col]
+                    result[row,col] = self.m[row0 + row][col0 + col]
             return result
         else:
             raise TypeError("Invalid index type " + str(index))
@@ -69,10 +69,10 @@ class Matrix(object):
             for i, v in enumerate(values):
                 self[index,i] = v
         elif isinstance(index, slice):
-            index = self._expand_slice(index)
-            for row in range(index.stop[0] - index.start[0]):
-                for col in range(index.stop[1] - index.start[1]):
-                    self.m[index.start[0] + row][index.start[1] + col] = values[row][col]
+            (row0, col0), (row1, col1) = self._expand_slice(index)
+            for row in range(row1 - row0):
+                for col in range(col1 - col0):
+                    self.m[row0 + row][col0 + col] = values[row][col]
         else:
             raise TypeError("Invalid index type " + str(index))
 
