@@ -153,16 +153,20 @@ class Matrix(object):
             col = index % self.width
             return self.m[row][col]
         elif isinstance(index, slice):
-            (row0, col0), (row1, col1) = self._expand_slice(index)
+            t = index.start or index.stop
+            if isinstance(t, int):
+                return list(self)[index]
+            else:
+                (row0, col0), (row1, col1) = self._expand_slice(index)
 
-            height = row1 - row0
-            width = col1 - col0
+                height = row1 - row0
+                width = col1 - col0
 
-            result = Matrix(height, width)
-            for row in range(height):
-                for col in range(width):
-                    result[row,col] = self.m[row0 + row][col0 + col]
-            return result
+                result = Matrix(height, width)
+                for row in range(height):
+                    for col in range(width):
+                        result[row,col] = self.m[row0 + row][col0 + col]
+                return result
         else:
             raise TypeError("Invalid index type " + str(index))
 
@@ -183,12 +187,18 @@ class Matrix(object):
             col = index % self.width
             self.m[row][col] = values
         elif isinstance(index, slice):
-            (row0, col0), (row1, col1) = self._expand_slice(index)
-            if isinstance(values, Matrix):
-                values = values.m
-            for row in range(row1 - row0):
-                for col in range(col1 - col0):
-                    self.m[row0 + row][col0 + col] = values[row][col]
+            t = index.start or index.stop
+            if isinstance(t, int):
+                start, stop, stride = index.indices(len(self))
+                for i, j in enumerate(range(start, stop, stride)):
+                    self[i] = values[i]
+            else:
+                (row0, col0), (row1, col1) = self._expand_slice(index)
+                if isinstance(values, Matrix):
+                    values = values.m
+                for row in range(row1 - row0):
+                    for col in range(col1 - col0):
+                        self.m[row0 + row][col0 + col] = values[row][col]
         else:
             raise TypeError("Invalid index type " + str(index))
 
@@ -205,4 +215,4 @@ class Matrix(object):
         if isinstance(other, Matrix):
             return self.m == other.m
         else:
-            return self.m == other
+            return self.m == other or list(self) == other

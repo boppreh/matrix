@@ -38,6 +38,8 @@ class Test(unittest.TestCase):
         self.assertEqual([[5, 6], [8, 9]], m[(1,1):(3,3)])
         self.assertEqual([[5, 6], [8, 9]], m[(1,1):])
         self.assertEqual([[5, 6], [8, 9]], m[(-2,-2):])
+        
+        self.assertEqual([2, 3, 4, 5, 6, 7, 8], m[1:-1])
 
     def test_assignment(self):
         m = self.m()
@@ -49,6 +51,8 @@ class Test(unittest.TestCase):
         self.assertEqual([[0]], m[(0,0):(1,1)])
         m[(0,0):] = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
         self.assertEqual(self.m(), m)
+        m[0:-1] = [-1, -2, -3, -4, -5, -6, -7, -8]
+        self.assertEqual([-1, -2, -3, -4, -5, -6, -7, -8, 9], m)
 
     def test_helpers(self):
         m = self.m()
