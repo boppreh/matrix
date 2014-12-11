@@ -14,6 +14,12 @@ class Matrix(object):
             self.width = width
             self.m = [[None] * width for row in range(height)]
 
+    def row(self, n):
+        return list(self.m[n])
+
+    def col(self, n):
+        return [row[n] for row in self]
+
     def _expand_slice(self, index):
         start = list(index.start or (0, 0))
         stop = list(index.stop or (self.height, self.width))
@@ -24,6 +30,10 @@ class Matrix(object):
         if stop[1] < 0: stop[1] += self.width
 
         return slice(start, stop, index.step)
+
+    def __iter__(self):
+        for row in range(self.height):
+            yield self[row]
 
     def __getitem__(self, index):
         if isinstance(index, tuple):

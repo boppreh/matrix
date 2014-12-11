@@ -21,6 +21,12 @@ class Test(unittest.TestCase):
         self.assertEqual([1, 2, 3], m[0])
         self.assertEqual([7, 8, 9], m[2])
 
+        self.assertEqual([1, 2, 3], m.row(0))
+        self.assertEqual([4, 5, 6], m.row(1))
+        self.assertEqual([1, 4, 7], m.col(0))
+        self.assertEqual([2, 5, 8], m.col(1))
+        self.assertEqual([3, 6, 9], m.col(-1))
+
     def test_slice(self):
         m = Matrix()
         self.assertEqual(m, m[(0,0):(3,3)])
