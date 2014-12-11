@@ -71,6 +71,10 @@ class Test(unittest.TestCase):
         m.addcol(1, [-1, -2, -3, -4])
         self.assertEqual([[1, -1, 2, 3], [-1, -2, -2, -3], [4, -3, 5, 6], [7, -4, 8, 9]], m)
 
+        m.removecol(1)
+        m.removerow(1)
+        self.assertEqual(self.m(), m)
+
     def test_map(self):
         m = self.m()
         self.assertEqual([1, 4, 9], m.map(lambda v: v**2).row(0))

@@ -76,6 +76,15 @@ class Matrix(object):
             line.insert(i, values[row])
         self.width += 1
 
+    def removerow(self, i):
+        """ Removes the i'th row. """
+        self.m.pop(i)
+
+    def removecol(self, i):
+        """ Removes the i'th column. """
+        for row in self.m:
+            row.pop(i)
+
     def indices(self):
         """
         Lists all indices (indexes), e.g. (0, 0), (0, 1), (0, 2), (1, 0)...
