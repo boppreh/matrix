@@ -56,11 +56,17 @@ class Test(unittest.TestCase):
         self.assertEqual([3, 6, 9], m.col(-1))
 
         self.assertEqual(list(range(1, 10)), list(m.list()))
+        self.assertEqual((0, 0), next(m.indices()))
 
         m.addrow(1, [-1, -2, -3])
         self.assertEqual([[1, 2, 3], [-1, -2, -3], [4, 5, 6], [7, 8, 9]], m)
         m.addcol(1, [-1, -2, -3, -4])
         self.assertEqual([[1, -1, 2, 3], [-1, -2, -2, -3], [4, -3, 5, 6], [7, -4, 8, 9]], m)
+
+    def test_map(self):
+        m = Matrix()
+        self.assertEqual([1, 4, 9], m.map(lambda v: v**2)[0])
+        self.assertEqual([0, 1, 2], m.indexmap(lambda i, v: sum(i))[0])
 
 
 if __name__ == '__main__':

@@ -32,9 +32,29 @@ class Matrix(object):
         self.width += 1
 
     def list(self):
+        for row, col in self.indices():
+            yield self.m[row][col]
+
+    def indices(self):
         for row in range(self.width):
             for col in range(self.height):
-                yield self.m[row][col]
+                yield (row, col)
+
+    def map(self, fn):
+        result = Matrix(self)
+        for row, col in self.indices():
+            result[row, col] = fn(self[row, col])
+        return result
+
+    def indexmap(self, fn):
+        result = Matrix(self)
+        for row, col in self.indices():
+            index = (row, col)
+            result[index] = fn(index, self[index])
+        return result
+
+    def __len__(self):
+        return self.height
 
     def _expand_slice(self, index):
         start = list(index.start or (0, 0))
