@@ -21,12 +21,6 @@ class Test(unittest.TestCase):
         self.assertEqual([1, 2, 3], m[0])
         self.assertEqual([7, 8, 9], m[2])
 
-        self.assertEqual([1, 2, 3], m.row(0))
-        self.assertEqual([4, 5, 6], m.row(1))
-        self.assertEqual([1, 4, 7], m.col(0))
-        self.assertEqual([2, 5, 8], m.col(1))
-        self.assertEqual([3, 6, 9], m.col(-1))
-
     def test_slice(self):
         m = Matrix()
         self.assertEqual(m, m[(0,0):(3,3)])
@@ -49,6 +43,20 @@ class Test(unittest.TestCase):
         self.assertEqual([3, 2, 1], m[0])
         m[(0,0):(1,1)] = [[0]]
         self.assertEqual([[0]], m[(0,0):(1,1)])
+        m[(0,0):] = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        self.assertEqual(Matrix(), m)
+
+    def test_helpers(self):
+        m = Matrix()
+
+        self.assertEqual([1, 2, 3], m.row(0))
+        self.assertEqual([4, 5, 6], m.row(1))
+        self.assertEqual([1, 4, 7], m.col(0))
+        self.assertEqual([2, 5, 8], m.col(1))
+        self.assertEqual([3, 6, 9], m.col(-1))
+
+        self.assertEqual(list(range(1, 10)), list(m.list()))
+
 
 if __name__ == '__main__':
     unittest.main()

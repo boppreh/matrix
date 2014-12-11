@@ -20,6 +20,11 @@ class Matrix(object):
     def col(self, n):
         return [row[n] for row in self]
 
+    def list(self):
+        for row in range(self.width):
+            for col in range(self.height):
+                yield self.m[row][col]
+
     def _expand_slice(self, index):
         start = list(index.start or (0, 0))
         stop = list(index.stop or (self.height, self.width))
