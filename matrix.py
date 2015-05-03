@@ -13,7 +13,7 @@ class Matrix(object):
     m[5] = 10
     m[(0,0):(2,2)] = m[(1,1):(2,2)]
     """
-    def __init__(self, height=None, width=None):
+    def __init__(self, height=None, width=None, default=None):
         """
         Matrix() -> 0 by 0 matrix.
         Matrix(2, 3) -> empty matrix with 2 rows and 3 columns filled with None.
@@ -33,12 +33,12 @@ class Matrix(object):
             else:
                 self.height = len(matrix)
                 self.width = len(matrix[0])
-            self.m = [[None] * self.width for row in range(self.height)]
+            self.m = [[default] * self.width for row in range(self.height)]
             self[:] = matrix
         else:
             self.height = height
             self.width = width
-            self.m = [[None] * width for row in range(height)]
+            self.m = [[default] * width for row in range(height)]
 
     def __bool__(self):
         """
