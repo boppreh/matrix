@@ -278,7 +278,7 @@ class Matrix(object):
         4 5 6
         7 8 9
         """
-        return '\n' + '\n'.join(' '.join(map(str, line)) for line in self.m) + '\n'
+        return '\n'.join(' '.join(map(str, line)) for line in self.m) + '\n'
 
     def __eq__(self, other):
         """ Equality testing allows comparing to list of lists. """
@@ -302,10 +302,10 @@ class _AbstractCursor(object):
 
     @property
     def value(self):
-        return self.board[self.col, self.row]
+        return self.board[self.row, self.col]
 
     @value.setter
-    def set_value(self, v):
+    def value(self, v):
         self.board[self.row, self.col] = v
 
     @property
@@ -350,6 +350,11 @@ class DefaultingCursor(_AbstractCursor):
     @property
     def value(self):
         return self.board[self.row, self.col] if self.is_valid else self.default
+
+    @value.setter
+    def set_value(self, v):
+        if self.is_valid:
+            self.board[self.row, self.col] = v
 
     @property
     def display(self):
