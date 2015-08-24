@@ -1,5 +1,5 @@
 """
-Package for a 2D pythonic Matrix data type. Exports only the Matrix class.
+Package for a 2D pythonic Matrix data type.
 """
 
 class Matrix(object):
@@ -63,7 +63,7 @@ class Matrix(object):
         Adds a row at the i'th position, optionally passing the list of values
         to fill the new row (defaults to all None).
         """
-        self.m.insert(i, values or [None] * self.width)
+        self.m.insert(i, list(values) or [None] * self.width)
         self.height += 1
 
     def addcol(self, i, values=None):
@@ -71,7 +71,7 @@ class Matrix(object):
         Adds a column at the i'th position, optionally passing the list of
         values to fill the new column (defaults to all None).
         """
-        values = values or [None] * self.height
+        values = list(values) or [None] * self.height
         for row, line in enumerate(self.m):
             line.insert(i, values[row])
         self.width += 1
@@ -154,6 +154,11 @@ class Matrix(object):
 
         return (start[0], start[1]), (stop[0], stop[1])
 
+    def getdefault(self, row, col, default):
+        if row < 0 or col < 0 or row >= self.width or col >= self.height:
+            return default
+        return self[row, col]
+
     def __getitem__(self, index):
         """
         Reads values from the matrix. Index can be a int (returning the i'th
@@ -234,3 +239,90 @@ class Matrix(object):
             return self.m == other.m
         else:
             return self.m == other or list(self) == other
+
+class _AbstractCursor(object):
+    def __init__(self, board, col=None, row=None):
+        self.board = board
+        self.row = row if row is not None else self.board.height // 2
+        self.col = col if col is not None else self.board.width // 2
+        self.symbol = '@'
+
+    def move(self, drow, dcol):
+        if drow == -1: self.up()
+        if drow == 1: self.down()
+        if dcol == -1: self.left()
+        if dcol == 1: self.right()
+
+    @property
+    def value(self):
+        return self.board[self.col, self.row]
+
+    @value.setter
+    def set_value(self, v):
+        self.board[self.row, self.col] = v
+
+    @property
+    def movements(self):
+        return {'up': self.up, 'down': self.down, 'right': self.right, 'left': self.left}
+
+    @property
+    def display(self):
+        old = self.board[self.row, self.col]
+        self.board[self.row, self.col] = self.symbol
+        text = str(self.board)
+        self.board[self.row, self.col] = old
+        return text
+
+    def __repr__(self):
+        return '{}(row={}, col={}, board={}x{})'.format(self.__class__.__name__, self.row, self.col, self.board.height, self.board.width)
+
+class WrappingCursor(_AbstractCursor):
+    def up(self):
+        self.row = (self.row - 1 + self.board.height) % self.board.height
+    def down(self):
+        self.row = (self.row + 1 + self.board.height) % self.board.height
+    def right(self):
+        self.col = (self.col + 1 + self.board.height) % self.board.width
+    def left(self):
+        self.col = (self.col - 1 + self.board.height) % self.board.width
+
+class DefaultingCursor(_AbstractCursor):
+    def __init__(self, board, default=None, row=None, col=None):
+        self.default = default
+        super(DefaultingCursor, self).__init__(board, row, col)
+
+    def up(self): self.row += 1
+    def down(self): self.row -= 1
+    def right(self): self.col += 1
+    def left(self): self.col -= 1
+
+    @property
+    def is_valid(self):
+        return self.col >= 0 and self.row >= 0 and self.col < self.board.width and self.row < self.board.height
+
+    @property
+    def value(self):
+        return self.board[self.row, self.col] if self.is_valid else self.default
+
+    @property
+    def display(self):
+        if not self.is_valid:
+            return repr(self.board)
+        return _AbstractCursor.display.fget(self)
+
+class BoundedCursor(_AbstractCursor):
+    def up(self):
+        if self.row > 0:
+            self.row -= 1
+
+    def down(self):
+        if self.row < self.board.height - 1:
+            self.row += 1
+
+    def left(self):
+        if self.col > 0:
+            self.col -= 1
+
+    def right(self):
+        if self.col < self.board.width - 1:
+            self.col += 1
