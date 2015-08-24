@@ -58,6 +58,16 @@ class Matrix(object):
         """
         return [row[n] for row in self.m]
 
+    @property
+    def rows(self):
+        """ Returns a list with all rows. """
+        return [self.row(i) for i in range(self.height)]
+
+    @property
+    def cols(self):
+        """ Returns a list with all columns. """
+        return [self.col(i) for i in range(self.width)]
+
     def addrow(self, i, values=None):
         """
         Adds a row at the i'th position, optionally passing the list of values
@@ -241,7 +251,7 @@ class Matrix(object):
             return self.m == other or list(self) == other
 
 class _AbstractCursor(object):
-    def __init__(self, board, col=None, row=None):
+    def __init__(self, board, row=None, col=None):
         self.board = board
         self.row = row if row is not None else self.board.height // 2
         self.col = col if col is not None else self.board.width // 2
