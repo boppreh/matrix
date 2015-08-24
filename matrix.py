@@ -58,6 +58,28 @@ class Matrix(object):
         """
         return [row[n] for row in self.m]
 
+    def diagonal(self, n, direction=+1):
+        """
+        Returns the n-th diagonal. Direction can be +1 (left to right) or -1
+        (right to left). Example diagonal numbers:
+
+        3 2 1 0
+        4 3 2 1
+        5 4 3 2
+        """
+        if n < 0 or n >= self.width + self.height - 1:
+            raise IndexError('Invalid diagonal number {}.'.format(n))
+
+        row = n - self.height
+        col = 0 if direction == 1 else self.width - 1
+        for i in range(self.height * 2):
+            if row >= self.height or col >= self.width:
+                break
+            if row >= 0 and col >= 0:
+                yield self[row, col]
+            col += direction
+            row += 1
+
     @property
     def rows(self):
         """ Returns a list with all rows. """
@@ -68,12 +90,23 @@ class Matrix(object):
         """ Returns a list with all columns. """
         return [self.col(i) for i in range(self.width)]
 
+    @property
+    def diagonals(self):
+        """
+        Returns a list containing all diagonals, both left to right and right
+        to left.
+        """
+        return ([list(self.diagonal(i, 1))
+                 for i in range(self.width + self.height - 1)] +
+                [list(self.diagonal(i, -1))
+                 for i in range(self.width + self.height - 1)])
+
     def addrow(self, i, values=None):
         """
         Adds a row at the i'th position, optionally passing the list of values
         to fill the new row (defaults to all None).
         """
-        self.m.insert(i, list(values) or [None] * self.width)
+        self.m.insert(i, list(values or [None] * self.width))
         self.height += 1
 
     def addcol(self, i, values=None):
@@ -81,7 +114,7 @@ class Matrix(object):
         Adds a column at the i'th position, optionally passing the list of
         values to fill the new column (defaults to all None).
         """
-        values = list(values) or [None] * self.height
+        values = list(values or [None] * self.height)
         for row, line in enumerate(self.m):
             line.insert(i, values[row])
         self.width += 1
@@ -164,6 +197,12 @@ class Matrix(object):
 
         return (start[0], start[1]), (stop[0], stop[1])
 
+    def _row_col_to_index(self, row, col):
+        return row * self.width + col
+
+    def _index_to_row_col(self, index):
+        return index // self.width, index % self.width
+
     def getdefault(self, row, col, default):
         if row < 0 or col < 0 or row >= self.width or col >= self.height:
             return default
@@ -182,8 +221,7 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            row = index // self.width
-            col = index % self.width
+            row, col = self._index_to_row_col(index)
             return self.m[row][col]
         elif isinstance(index, slice):
             t = index.start or index.stop
@@ -216,8 +254,7 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            row = index // self.width
-            col = index % self.width
+            row, col = self._index_to_row_col(index)
             self.m[row][col] = values
         elif isinstance(index, slice):
             t = index.start or index.stop
