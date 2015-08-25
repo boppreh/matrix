@@ -311,11 +311,18 @@ class Matrix(object):
 
     def __repr__(self):
         """
-        1 2 3
-        4 5 6
-        7 8 9
+        Returns a multi-line string representation of the matrix. Columns are
+        aligned based on the largest item.
+
+         1  2  3  4
+         5  6  7  8
+         9 10 11 12
+        13 14 15 16
         """
-        return '\n'.join(' '.join(map(str, line)) for line in self.m) + '\n'
+        max_length = max(len(str(i)) for i in self)
+        template = '{: >' + str(max_length) + '}'
+        lines = (' '.join(map(template.format, line)) for line in self.m)
+        return '\n'.join(lines) + '\n'
 
     def __eq__(self, other):
         """ Equality testing allows comparing to list of lists. """
