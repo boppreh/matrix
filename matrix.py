@@ -163,6 +163,43 @@ class Matrix(object):
             result[index] = fn(index, self[index])
         return result
 
+    def neighbors(self, row, col, include_diagonals=True):
+        """
+        Returns all values neighboring the given (row, col) position. Positions
+        outside the board are omitted.
+
+        . . . . .
+        . x x x .
+        . x @ x .
+        . x x x .
+        . . . . .
+
+        @ x . . .
+        x x . . .
+        . . . . .
+        . . . . .
+        . . . . .
+
+        Without `include_diagonals`:
+
+        . . . . .
+        . . x . .
+        . x @ x .
+        . . x . .
+        . . . . .
+
+        @ x . . .
+        x . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        """
+        for i in range(max(0, row - 1), min(row + 2, self.height)):
+            for j in range(max(0, col - 1), min(col + 2, self.width)):
+                is_diagonal = (row - i != 0) and (col - j != 0)
+                if (i, j) != (row, col) and (include_diagonals or not is_diagonal):
+                    yield self[i, j]
+
     def __len__(self):
         """
         Length  returns total number of elements, regardless of rows and
