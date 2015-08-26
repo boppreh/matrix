@@ -7,11 +7,11 @@ from collections import defaultdict
 size = int(input('Board size (default 3): ') or 3)
 win_size = int(input('Sequence size to win (default 3): ') or 3)
 
-count = iter(range(1, size * size + 1))
 # The Matrix method `map` calls fn(cell_value) for every cell and builds a new
 # matrix with the results. Here we fill the matrix with numbers from 1 to
 # N^2+1.
-board = Matrix(size, size, '').map(lambda i: str(next(count)))
+count = (str(i) for i in range(1, size * size + 1))
+board = Matrix(size, size, data=count, default='')
 
 turn = 'x'
 
@@ -47,14 +47,13 @@ while True:
 
     # Verify if there are three of the player symbols in a row.
     if turn * 3 in str_directions:
-        # "Translate" the board by passing the cells through this translation
-        # dictionary. This filters out the numbers and replaces them with dots.
-        translation = defaultdict({'x': 'x', 'o': 'o'}, '.')
-        print('\n{} wins!\n{}'.format(turn, board.translate(translation)))
-        exit()
+        # Maps every cell removing the ones that are still numbers.
+        clean_board = board.map(lambda i: i if i in 'xo' else '')
+        print('\n{} wins!\n{}'.format(turn, clean_board))
+        break()
 
     if all(i in ('x', 'o') for i in board):
         print('\nDraw!\n{}'.format(board))
         break
 
-    turn = 'x' if turn == 'x' else 'o'
+    turn = {'x': 'o', 'o': 'x'}[turn]
