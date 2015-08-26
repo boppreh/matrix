@@ -13,7 +13,7 @@ class Matrix(object):
     m[5] = 10
     m[(0,0):(2,2)] = m[(1,1):(2,2)]
     """
-    def __init__(self, height=None, width=None, default=None):
+    def __init__(self, height=0, width=0, data=None, default=None):
         """
         Matrix() -> 0 by 0 matrix.
         Matrix(2, 3) -> empty matrix with 2 rows and 3 columns filled with None.
@@ -21,30 +21,39 @@ class Matrix(object):
 
         Matrices given are copied, not shared.
         """
-        if height is None:
-            self.height = 0
-            self.width = 0
-            self.m = []
-        elif width is None:
-            matrix = height
-            if isinstance(matrix, Matrix):
-                self.height = matrix.height
-                self.width = matrix.width
-            else:
-                self.height = len(matrix)
-                self.width = len(matrix[0])
-            self.m = [[default] * self.width for row in range(self.height)]
-            self[:] = matrix
-        else:
-            self.height = height
-            self.width = width
+        if height and width and not data:
+            # Matrix(15, 15)
             self.m = [[default] * width for row in range(height)]
+        elif not height and not width and not data:
+            # Matrix()
+            self.m = []
+        elif height and width and data:
+            # Matrix(10, 15, range(10 * 15))
+            iterator = iter(data)
+            self.m = [[next(iterator) for i in range(width)] for j in range(height)]
+        elif height and not width and not data:
+            # Matrix([[1, 2], [3, 4]])
+            data, height = height, None
+            if isinstance(data, Matrix):
+                height = data.height
+                width = data.width
+                self.m = [[data[j, i] for i in range(width)] for j in range(height)]
+            else:
+                assert isinstance(data, list) and isinstance(data[0], list)
+                height = len(data)
+                width = len(data[0])
+                self.m = [[data[j][i] for i in range(width)] for j in range(height)]
+        else:
+            raise ValueError('Unknown constructor combination.')
+
+        self.height = height
+        self.width = width
 
     def __bool__(self):
         """
         A matrix is True if it has at least one item, regardless of value.
         """
-        return self.height and self.width
+        return self.height != 0 and self.width != 0
 
     def index(self, value):
         """
@@ -53,7 +62,7 @@ class Matrix(object):
         for row, col in self.indices():
             if self[row, col] == value:
                 return (row, col)
-        return None
+        raise KeyError('Value {} not found in matrix.'.format(value))
 
     def row(self, n):
         """
