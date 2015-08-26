@@ -52,8 +52,7 @@ class Matrix(object):
         """
         for row, col in self.indices():
             if self[row, col] == value:
-                print(row, col)
-                return value
+                return (row, col)
         return None
 
     def row(self, n):
@@ -243,10 +242,10 @@ class Matrix(object):
 
         return (start[0], start[1]), (stop[0], stop[1])
 
-    def _row_col_to_index(self, row, col):
+    def row_col_to_index(self, row, col):
         return row * self.width + col
 
-    def _index_to_row_col(self, index):
+    def index_to_row_col(self, index):
         return index // self.width, index % self.width
 
     def getdefault(self, row, col, default):
@@ -267,7 +266,7 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            row, col = self._index_to_row_col(index)
+            row, col = self.index_to_row_col(index)
             return self.m[row][col]
         elif isinstance(index, slice):
             t = index.start or index.stop
@@ -300,7 +299,7 @@ class Matrix(object):
             elif len(index) == 3:
                 raise TypeError("You probably typed m[0,0:2,2] instead of m[(0,0):(2,2)].")
         elif isinstance(index, int):
-            row, col = self._index_to_row_col(index)
+            row, col = self.index_to_row_col(index)
             self.m[row][col] = values
         elif isinstance(index, slice):
             t = index.start or index.stop
