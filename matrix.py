@@ -6,7 +6,7 @@ class Matrix(object):
     """
     2D matrix, accessible via regular indexing and slicing operators, with a
     few helper functions. All operations mutate the matrix in place, except
-    `map` and `indexedmap`.
+    `map` and `indexmap`.
 
     Usage:
     m = Matrix(2, 3)
@@ -45,6 +45,16 @@ class Matrix(object):
         A matrix is True if it has at least one item, regardless of value.
         """
         return self.height and self.width
+
+    def index(self, value):
+        """
+        Returns the (row, col) of the first occurrence of `value` or None.
+        """
+        for row, col in self.indices():
+            if self[row, col] == value:
+                print(row, col)
+                return value
+        return None
 
     def row(self, n):
         """
