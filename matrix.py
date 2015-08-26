@@ -68,27 +68,26 @@ class Matrix(object):
         """
         return [row[n] for row in self.m]
 
-    def diagonal(self, n, direction=+1):
+    def diagonal(self, row, col, direction=+1):
         """
-        Returns the n-th diagonal. Direction can be +1 (left to right) or -1
-        (right to left). Example diagonal numbers:
-
-        3 2 1 0
-        4 3 2 1
-        5 4 3 2
+        Returns the diagonal that passes through (row, col). Direction can be +1
+        (left to right) or -1 (right to left).
         """
-        if n < 0 or n >= self.width + self.height - 1:
-            raise IndexError('Invalid diagonal number {}.'.format(n))
+        # Moves (row, col) to beginning of diagonal.
+        if direction == 1:
+            distance_to_start = min(row, col)
+        else:
+            distance_to_start = min(row, self.width - col - 1)
+        col -= direction * distance_to_start
+        row -= distance_to_start 
 
-        row = n - self.height
-        col = 0 if direction == 1 else self.width - 1
-        for i in range(self.height * 2):
-            if row >= self.height or col >= self.width:
-                break
-            if row >= 0 and col >= 0:
-                yield self[row, col]
+        # Advance (row, col) until we reach the end of the matrix.
+        result = []
+        while row < self.height and 0 <= col < self.width:
+            result.append(self[row, col])
             col += direction
             row += 1
+        return result
 
     @property
     def rows(self):
@@ -106,10 +105,10 @@ class Matrix(object):
         Returns a list containing all diagonals, both left to right and right
         to left.
         """
-        return ([list(self.diagonal(i, 1))
-                 for i in range(self.width + self.height - 1)] +
-                [list(self.diagonal(i, -1))
-                 for i in range(self.width + self.height - 1)])
+        return ([self.diagonal(0, i) for i in range(self.width)] +
+                [self.diagonal(i, 0) for i in range(1, self.height)] +
+                [self.diagonal(0, i, -1) for i in range(self.height)] +
+                [self.diagonal(i, self.width - 1, -1) for i in range(self.height)])
 
     def addrow(self, i, values=None):
         """

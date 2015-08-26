@@ -3,7 +3,9 @@ from matrix import *
 
 class Test(unittest.TestCase):
     def m(self):
-        return Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        return Matrix([[1, 2, 3],
+                       [4, 5, 6],
+                       [7, 8, 9]])
 
     def test_create(self):
         m1 = Matrix(2, 3)
@@ -80,6 +82,31 @@ class Test(unittest.TestCase):
         self.assertEqual([1, 4, 9], m.map(lambda v: v**2).row(0))
         self.assertEqual([0, 1, 2], m.indexmap(lambda i, v: sum(i)).row(0))
 
+    def test_diagonals(self):
+        m = self.m()
+        self.assertEqual(m.diagonal(0, 0), [1, 5, 9])
+        self.assertEqual(m.diagonal(1, 1), [1, 5, 9])
+        self.assertEqual(m.diagonal(2, 2), [1, 5, 9])
+        self.assertEqual(m.diagonal(0, 1), [2, 6])
+        self.assertEqual(m.diagonal(1, 2), [2, 6])
+        self.assertEqual(m.diagonal(0, 2), [3])
+        self.assertEqual(m.diagonal(1, 0), [4, 8])
+        self.assertEqual(m.diagonal(2, 1), [4, 8])
+        self.assertEqual(m.diagonal(2, 0), [7])
+
+        self.assertEqual(m.diagonal(0, 0, -1), [1])
+        self.assertEqual(m.diagonal(1, 0, -1), [2, 4])
+        self.assertEqual(m.diagonal(0, 1, -1), [2, 4])
+        self.assertEqual(m.diagonal(0, 2, -1), [3, 5, 7])
+        self.assertEqual(m.diagonal(1, 1, -1), [3, 5, 7])
+        self.assertEqual(m.diagonal(2, 0, -1), [3, 5, 7])
+        self.assertEqual(m.diagonal(1, 2, -1), [6, 8])
+        self.assertEqual(m.diagonal(2, 1, -1), [6, 8])
+        self.assertEqual(m.diagonal(2, 2, -1), [9])
+
+        count = iter(range(6))
+        m = Matrix(2, 3) .map(lambda i: next(count))
+        self.assertEqual(m.diagonals, [[0, 4], [1, 5], [2], [3], [0], [1, 3], [2, 4], [5]])
 
 if __name__ == '__main__':
     m = Matrix(2, 3) # 2 rows, 3 columns, filled with None.
