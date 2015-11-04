@@ -34,7 +34,6 @@ while True:
             break
         except Exception as e:
             print(e)
-            pass
 
     # Make a list of all lines that pass through the cell played.
     directions = [board.row(row),
